@@ -2,7 +2,7 @@
 Search through ordered wikimedia pagecounts
 
 ## Pre-requisites
-This project has been tested only in Python 3.5. May work with Python 3.4, but `pathlib` must be installed separately.
+This project has been tested only with Python 3.5. It may work with Python 3.4, too.
 
 ## Installation
     pip install git+https://github.com/youtux/pagecounts-search.git
