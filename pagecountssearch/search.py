@@ -33,7 +33,7 @@ class Finder:
         """Initialize the search engine."""
         self.source_dir = source_dir
         if index_path is None:
-            index_path = source_dir/'index'
+            index_path = default_index_path(source_dir)
 
         if not index_path.exists() and auto_index:
             print('Building index... ', end='', flush=True, file=sys.stderr)
@@ -48,6 +48,10 @@ class Finder:
     def search(self, project, page):
         """Search for the given project and page."""
         return search(self.source_dir, self.index, project, page)
+
+
+def default_index_path(source_dir):
+    return source_dir/'index'
 
 
 def parse_timestamp(timestamp):
@@ -178,6 +182,9 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    if args.index_path is None:
+        args.index_path = default_index_path(args.source_dir)
 
     if args.command == 'search':
         f = Finder(args.source_dir, args.index_path)
