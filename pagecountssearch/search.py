@@ -9,6 +9,7 @@ import sys
 from urllib.parse import quote, unquote
 
 import pathlib
+
 from .sortedcollection import SortedCollection
 
 __all__ = ('Finder', 'search', 'build_index')
@@ -43,11 +44,69 @@ class Finder:
         if not index_path.exists():
             raise ValueError('Index file does not exists.')
 
+        self.curr_file_path = None
+        self.curr_file = None
+        self.curr_iter = None
+
+        self.last_key = None
+
         self.index = read_index(index_path)
 
-    def search(self, project, page):
+    def slow_search(self, project, page):
         """Search for the given project and page."""
         return search(self.source_dir, self.index, project, page)
+
+    def _switch_file(self, new_file_path):
+        if self.curr_file:
+            self.curr_file.close()
+        self.curr_file_path = new_file_path
+        self.curr_file = gzip_open(str(new_file_path))
+
+    @functools.lru_cache(1)
+    def search(self, project, page):
+        part_file_name = self.index.find_le((project, page)).file_name
+
+        part_file_path = self.source_dir/part_file_name
+
+        file_changed = self.curr_file_path != part_file_path
+
+        if file_changed or self.last_key >= (project, page):
+            self._switch_file(part_file_path)
+            self.curr_iter = parse_and_group_records(self.curr_file)
+
+        for key, records_group in self.curr_iter:
+            self.last_key = key
+            if key < (project, page):
+                continue
+            if key > (project, page):
+                break
+
+            return [
+                (timestamp, count, bytes_trans)
+                for _, _, timestamp, count, bytes_trans in records_group
+            ]
+
+        return []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        if self.curr_file:
+            self.curr_file.close()
+            self.curr_file = None
+            self.curr_file_path = None
+
+
+def parse_and_group_records(lines):
+    records = (parse_line(line) for line in lines)
+
+    grouped_records = itertools.groupby(
+        records,
+        key=lambda record: (record[0], record[1]),
+    )
+
+    return grouped_records
 
 
 def default_index_path(source_dir):
