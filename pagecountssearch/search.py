@@ -121,12 +121,6 @@ quote_cached = functools.lru_cache(maxsize=10000)(quote)
 unquote_cached = functools.lru_cache(maxsize=10000)(unquote)
 
 
-def gzip_open(file_path):
-    f = subprocess.Popen(['gzip', '-cd', file_path], stdout=subprocess.PIPE)
-    w = io.TextIOWrapper(f.stdout, encoding='utf-8')
-    return w
-
-
 def parse_line(line):
     project, page, timestamp, count, bytes_trans = line[:-1].split(' ')
 
