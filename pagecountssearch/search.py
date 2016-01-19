@@ -3,7 +3,6 @@ import collections
 import datetime
 import functools
 import gzip
-import io
 import itertools
 import sys
 from urllib.parse import quote, unquote
@@ -114,7 +113,9 @@ def default_index_path(source_dir):
 
 
 def parse_timestamp(timestamp):
-    return datetime.datetime.strptime(timestamp, DATETIME_PATTERN)
+    naive_timestamp = datetime.datetime.strptime(timestamp, DATETIME_PATTERN)
+    timestamp = naive_timestamp.replace(tzinfo=datetime.timezone.utc)
+    return timestamp
 
 parse_timestamp_cached = functools.lru_cache(maxsize=10000)(parse_timestamp)
 quote_cached = functools.lru_cache(maxsize=10000)(quote)
