@@ -2,9 +2,9 @@ import argparse
 import collections
 import datetime
 import functools
+import gzip
 import io
 import itertools
-import subprocess
 import sys
 from urllib.parse import quote, unquote
 
@@ -60,7 +60,7 @@ class Finder:
         if self.curr_file:
             self.curr_file.close()
         self.curr_file_path = new_file_path
-        self.curr_file = gzip_open(str(new_file_path))
+        self.curr_file = gzip.open(str(new_file_path), 'rt', encoding='utf-8')
 
     @functools.lru_cache(1)
     def search(self, project, page):
@@ -151,7 +151,7 @@ def search(source_dir, index, project, page):
 
     part_file_path = source_dir/part_file_name
 
-    part_file = gzip_open(str(part_file_path))
+    part_file = gzip.open(str(part_file_path), 'rt', encoding='utf-8')
 
     with part_file:
         records = (parse_line(line) for line in part_file)
@@ -178,7 +178,7 @@ def search(source_dir, index, project, page):
 def build_index(source_dir, output_path):
     with output_path.open('wt', encoding='utf-8') as index_f:
         for part_file_path in sorted(source_dir.glob('part-*.gz')):
-            part_file = gzip_open(str(part_file_path))
+            part_file = gzip.open(str(part_file_path), 'rt', encoding='utf-8')
             with part_file:
                 line = part_file.readline()
                 record = parse_line(line)
