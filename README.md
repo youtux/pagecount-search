@@ -28,3 +28,6 @@ $ pagecounts-search /path/to/sorted/counts/folder search en Albert_Einstein
 20140101-060000 331 27369512
 [...]
 ```
+
+## Known issues
+* Wrong/partial result when retrieving statistics for a page that appears across different partial files [#1](https://github.com/youtux/pagecounts-search/issues/1)
