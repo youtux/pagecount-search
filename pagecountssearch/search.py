@@ -100,12 +100,10 @@ class Finder:
 def parse_and_group_records(lines):
     records = (parse_line(line) for line in lines)
 
-    grouped_records = itertools.groupby(
+    return itertools.groupby(
         records,
         key=lambda record: (record[0], record[1]),
     )
-
-    return grouped_records
 
 
 def default_index_path(source_dir):

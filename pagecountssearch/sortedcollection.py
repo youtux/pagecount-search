@@ -166,15 +166,13 @@ class SortedCollection(object):
 
     def find_le(self, k):
         'Return last item with a key <= k.  Raise ValueError if not found.'
-        i = bisect_right(self._keys, k)
-        if i:
+        if i := bisect_right(self._keys, k):
             return self._items[i-1]
         raise ValueError('No item found with key at or below: %r' % (k,))
 
     def find_lt(self, k):
         'Return last item with a key < k.  Raise ValueError if not found.'
-        i = bisect_left(self._keys, k)
-        if i:
+        if i := bisect_left(self._keys, k):
             return self._items[i-1]
         raise ValueError('No item found with key below: %r' % (k,))
 
@@ -205,45 +203,27 @@ if __name__ == '__main__':
 
     def slow_index(seq, k):
         'Location of match or -1 if not found'
-        for i, item in enumerate(seq):
-            if item == k:
-                return i
-        return -1
+        return next((i for i, item in enumerate(seq) if item == k), -1)
 
     def slow_find(seq, k):
         'First item with a key equal to k. -1 if not found'
-        for item in seq:
-            if item == k:
-                return item
-        return -1
+        return next((item for item in seq if item == k), -1)
 
     def slow_find_le(seq, k):
         'Last item with a key less-than or equal to k.'
-        for item in reversed(seq):
-            if item <= k:
-                return item
-        return -1
+        return next((item for item in reversed(seq) if item <= k), -1)
 
     def slow_find_lt(seq, k):
         'Last item with a key less-than k.'
-        for item in reversed(seq):
-            if item < k:
-                return item
-        return -1
+        return next((item for item in reversed(seq) if item < k), -1)
 
     def slow_find_ge(seq, k):
         'First item with a key-value greater-than or equal to k.'
-        for item in seq:
-            if item >= k:
-                return item
-        return -1
+        return next((item for item in seq if item >= k), -1)
 
     def slow_find_gt(seq, k):
         'First item with a key-value greater-than or equal to k.'
-        for item in seq:
-            if item > k:
-                return item
-        return -1
+        return next((item for item in seq if item > k), -1)
 
     from random import choice
     pool = [1.5, 2, 2.0, 3, 3.0, 3.5, 4, 4.0, 4.5]
